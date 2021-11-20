@@ -21,6 +21,10 @@ const userSchema = new Schema({
         type: Number,
         required: true
     },
+    subsPlan: {
+        type: String,
+        default: "none"
+    },
     date: {
         type: Date,
         default: Date.now

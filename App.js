@@ -58,7 +58,8 @@ app.post('/api/login_chk', async(req, resp)=>{
         username: usr_chk.username,
         email: usr_chk.email,
         phone: usr_chk.phone,
-        dj: usr_chk.date
+        dj: usr_chk.date,
+        subsPlan: usr_chk.subsPlan
     });
 })
 
@@ -68,13 +69,17 @@ app.post('/api/login', async (req, resp) => {
     try {
         const usr_chk = await User.findOne({ username });
         if (!usr_chk) {
-            return resp.json({ status: 'error', error: 'Invalid credentials' });
+            resp.json({ status: 'error', error: 'Invalid credentials' });
         }
         if (await Bcrypt.compare(pwd, usr_chk.pwd)) {
             const token = jwt.sign({id: usr_chk._id, username: usr_chk.username}, JWT_sec);
             console.log(token);
             console.log("Login sucess");
-            return resp.json({ status: 'ok', tok: token });
+            resp.json({ status: 'ok', tok: token, username: usr_chk.username,
+            email: usr_chk.email,
+            phone: usr_chk.phone,
+            dj: usr_chk.date,
+            subsPlan: usr_chk.subsPlan });
         }
 
         console.log(usr_chk);
@@ -111,10 +116,24 @@ app.post('/api/register', async (req, resp) => {
     resp.json({ status: 'ok' });
 })
 
-app.get("/hacked", (req, resp) => {
-    Blog.find()
-        .then((res) => {
-            resp.send(res)
-        })
+app.post('/api/subs_chg', async(req, resp)=>{
+    const { tok_key, subPlan } = req.body;
+    const tok2usr = jwt.verify(tok_key, JWT_sec); 
+    const usr_nm = tok2usr.username;
+    const usr_chk1 = await User.findOneAndUpdate({ username: usr_nm }, {subsPlan: subPlan}, {new: true}, (error, data)=>{
+        if(error){
+            console.log(error);
+        }
+        else{
+            console.log(data);
+            resp.json({
+                username: data.username,
+                email: data.email,
+                phone: data.phone,
+                dj: data.date,
+                subsPlan: data.subsPlan
+            });
+        }
+    });
+    
 })
-
