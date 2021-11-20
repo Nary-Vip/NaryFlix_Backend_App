@@ -29,15 +29,6 @@ let date = new Date();
 app.use(express.json());
 app.use(cors());
 
-
-app.get("/", (req, resp) => {
-    resp.sendFile(__dirname + "/static/index.html");
-})
-
-app.get('/login', (req, resp) => {
-    resp.sendFile(__dirname + "/static/login.html");
-})
-
 app.post('/api/changePassword', (req, resp)=>{
     const { token } = req.body;
     const user = jwt.verify(token, JWT_sec);
